@@ -1,68 +1,98 @@
-
-import React from 'react';
-import '../styles/soft.css';
 import '../styles/profil.css';
 import '../styles/gros.css';
+import React, { useState } from 'react';
+import { Card, Button, Collapse, InputGroup, FormControl } from 'react-bootstrap';
+import { FaThumbsUp, FaComment } from 'react-icons/fa';
 
-export default function HomePage() {
-    return <div>
+function ArticleCard({ title, content, imgSrc }) {
+    const [likes, setLikes] = useState(0);
+    const [comments, setComments] = useState([]); // État pour les commentaires
 
-        <div class="descend2">
-            <div class="container-fluid py-4">
-                <div class="container">
-                    <div class="row">
-                        <div class="col-md-8 mx-auto">
-                           
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <h5 class="card-title">Article 1</h5>
-                                    <p class="card-text">Contenu de l'article.</p>
-                                    <div class="col-md-4 mb-4">
-                                        <img src="./img/team-1.jpg" alt="Photo 1" class="img-fluid"/>
-                                    </div>
-                                    <button class="btn btn-outline-primary" id="likeArticle1">
-                                        <i class="fas fa-thumbs-up"></i> J'aime
-                                    </button>
-                                    <button class="btn btn-outline-secondary" data-bs-toggle="collapse"
-                                        data-bs-target="#commentCollapse1">
-                                        <i class="fas fa-comment"></i> Commenter
-                                    </button>
-                                    <div class="collapse mt-3" id="commentCollapse1">
-                                        <input type="text" class="form-control mb-2" placeholder="Votre commentaire" id="commentInput1"/>
-                                            <button class="btn btn-primary" id="submitComment1">Soumettre</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card mb-4">
-                                <div class="card-body">
-                                    <h5 class="card-title">Article 1</h5>
-                                    <p class="card-text">Contenu de l'article.</p>
-                                    <div class="col-md-4 mb-4">
-                                        <img src="./img/team-1.jpg" alt="Photo 1" class="img-fluid"/>
-                                    </div>
-                                    <button class="btn btn-outline-primary" id="likeArticle1">
-                                        <i class="fas fa-thumbs-up"></i> J'aime
-                                    </button>
-                                    <button class="btn btn-outline-secondary" data-bs-toggle="collapse"
-                                        data-bs-target="#commentCollapse1">
-                                        <i class="fas fa-comment"></i> Commenter
-                                    </button>
-                                    <div class="collapse mt-3" id="commentCollapse1">
-                                        <input type="text" class="form-control mb-2" placeholder="Votre commentaire" id="commentInput1"/>
-                                            <button class="btn btn-primary" id="submitComment1">Soumettre</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+    const handleLikeClick = () => {
+        setLikes(likes + 1);
+    };
 
+    const handleCommentSubmit = () => {
+        const commentInput = document.getElementById(`commentInput${title}`);
+        if (commentInput.value.trim() !== '') {
+            setComments([...comments, commentInput.value.trim()]); // Ajouter le commentaire
+            commentInput.value = ''; // Réinitialiser l'input
+        }
+    };
+
+    return (
+        <Card className="mb-4">
+            <Card.Body>
+                <Card.Title>{title}</Card.Title>
+                <Card.Text>{content}</Card.Text>
+                <div className="col-md-4 mb-4">
+                    <img src={imgSrc} alt="Photo" className="img-fluid" />
                 </div>
-
-
-            </div>
-
-        </div>
-
-    </div>
+                <Button variant="outline-primary" id={`like${title}`} onClick={handleLikeClick}>
+                    <FaThumbsUp /> J'aime {likes}
+                </Button>
+                <Button variant="outline-secondary" data-bs-toggle="collapse" data-bs-target={`#commentCollapse${title}`}>
+                    <FaComment /> Commenter
+                </Button>
+                <Collapse in={true} id={`commentCollapse${title}`}>
+                    <InputGroup className="mt-3 mb-2">
+                        <FormControl placeholder="Votre commentaire" id={`commentInput${title}`} />
+                        <Button variant="primary" id={`submitComment${title}`} onClick={handleCommentSubmit}>Soumettre</Button>
+                    </InputGroup>
+                </Collapse>
+                {comments.length > 0 && (
+                    <div className="mt-3">
+                        <h5 className="mb-4 text-sm mx-auto">Commentaires :</h5>
+                        <ul className="mb-4 text-sm mx-auto" >
+                            {comments.map((comment, index) => (
+                                <li key={index}>{comment}</li>
+                            ))}
+                        </ul>
+                        <hr />
+                    </div>
+                )}
+            </Card.Body>
+        </Card>
+    );
 }
 
+
+
+
+
+export default function HomePage() {
+    const articles = [
+        {
+            title: 'Article 1',
+            content: 'Contenu de l\'article 1.',
+            imgSrc: './img/team-1.jpg',
+        },
+        {
+            title: 'Article 2',
+            content: 'Contenu de l\'article 2.',
+            imgSrc: './img/team-2.jpg',
+        },
+        // Ajoutez d'autres articles ici si nécessaire
+    ];
+
+    return (
+        <div className="descend2">
+            <div className="container-fluid py-4">
+                <div className="container">
+                    <div className="row">
+                        <div className="col-md-8 mx-auto">
+                            {articles.map((article) => (
+                                <ArticleCard
+                                    key={article.title}
+                                    title={article.title}
+                                    content={article.content}
+                                    imgSrc={article.imgSrc}
+                                />
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}

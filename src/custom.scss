@@ -1,0 +1,11 @@
+// custom-bootstrap.scss
+
+// Import des variables Bootstrap
+@import "~bootstrap/scss/functions";
+@import "~bootstrap/scss/variables";
+
+// Définir votre propre couleur primaire
+$primary: #cb0c9f; // Remplacez ceci par votre couleur préférée
+
+// Compilez les fichiers Bootstrap avec vos modifications
+@import "~bootstrap/scss/bootstrap";
