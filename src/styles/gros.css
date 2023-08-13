@@ -1,0 +1,104 @@
+/* Ajoutez votre propre CSS ici pour personnaliser le formulaire selon vos préférences */
+body {
+    font-size: 1.2rem;
+    overflow-x: hidden;
+  }
+  
+  /* Désactiver l'opacité sombre du fond du modal */
+  .no-backdrop.modal {
+    background-color: transparent;
+  }
+  
+  .oblique-image {
+    width: 100%;
+    overflow: hidden;
+  }
+  
+  .bg-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-size: cover;
+    filter: blur(0); /* Pour annuler le flou sur l'image de fond */
+  }
+  
+  .bg-blur {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.5); /* Couleur de fond semi-transparente */
+    backdrop-filter: blur(1px); /* Effet de flou */
+  }
+  
+  
+  .facebak {
+    margin-top: 200px;
+    align-items: flex-start;
+    text-align: center;
+    position: relative;
+    z-index: 200;
+  }
+  
+  .facebak h1 {
+    font-size: 80px;
+  }
+  
+  .facebak .connect {
+    font-size: 30px;
+  }
+  .logo {
+    height: 100px;
+    width: 100px;
+  }
+  .okok {
+    display: flex;
+    flex-direction: row;
+  }
+  
+  
+  .descend{
+    margin-top: 30px;
+  }
+  .descend2{
+    margin-top: 100px;
+  }
+  .card {
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+      border-radius: 10px 10px 0 0;
+    }
+    
+    .form-label {
+      font-weight: bold;
+    }
+    
+    .btn-primary {
+      background-color: #007bff;
+      border-color: #007bff;
+    }
+    
+    .btn-primary:hover {
+      background-color: #0056b3;
+      border-color: #0056b3;
+    }
+    
+    .btn-primary:focus {
+      box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.5);
+    }
+    
+    /* Ajout du style pour afficher les champs en deux colonnes */
+    .row {
+      margin-bottom: 15px;
+    }
+  
+    .back {
+      background-color: aqua;
+    }
+    
