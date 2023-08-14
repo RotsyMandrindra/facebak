@@ -21,7 +21,7 @@ export default function Navbar() {
                             <div class="collapse navbar-collapse" id="navigation">
                                 <ul class="navbar-nav mx-auto ms-xl-auto me-xl-7">
                                     <li class="nav-item">
-                                        <Link to="/" className="nav-link d-flex align-items-center me-2 active">
+                                        <Link to="/home" className="nav-link d-flex align-items-center me-2 active">
                                             <i className="bi bi-house-door-fill opacity-6 me-1"></i>
                                             Home
                                         </Link>
@@ -39,7 +39,7 @@ export default function Navbar() {
                                         </Link>
                                     </li>
                                     <li className="nav-item">
-                                        <Link to="/signup" className="nav-link me-2">
+                                        <Link to="/" className="nav-link me-2">
                                             <i className="bi bi-key opacity-6 me-1"></i>
                                             Logout
                                         </Link>
@@ -53,7 +53,7 @@ export default function Navbar() {
 
                                 <ul className="navbar-nav d-lg-block d-none">
                                     <li className="nav-item">
-                                        <Link to="/profile" className="mb-0 me-1">
+                                        <Link to="/profil" className="mb-0 me-1">
                                             <img src="./img/team-1.jpg" alt="Profile Avatar" className="profile-avatar2" />
                                         </Link>
                                     </li>

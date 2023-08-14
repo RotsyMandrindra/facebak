@@ -13,9 +13,9 @@ function App() {
     <BrowserRouter>
       <Navbar />
       <Routes>
-        <Route path='/' element={<HomePage />} />
+        <Route path='/' element={<SignupPage />} />
         <Route path='/profil' element={<Profilpage />} />
-        <Route path='/signup' element={<SignupPage />} />
+        <Route path='/home' element={<HomePage />} />
         <Route path='/signin' element={<SigninPage />} />
       </Routes>
     </BrowserRouter>
