@@ -65,7 +65,7 @@ export default function SigninPage() {
                     <Card.Footer className="text-center pt-0 px-lg-2 px-1">
                       <p className="mb-4 text-sm mx-auto">
                         Don't have an account?
-                        <Link to="/signup" className="text-primary text-gradient font-weight-bold"> Sign Up </Link>
+                        <Link to="/" className="text-primary text-gradient font-weight-bold"> Sign Up </Link>
                       </p>
                     </Card.Footer>
                   </Card>

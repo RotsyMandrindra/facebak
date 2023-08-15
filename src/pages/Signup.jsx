@@ -1,4 +1,6 @@
 
+import axios from 'axios';
+import { apiEndpoint } from '../ApiConfig';
 import '../styles/profil.css';
 import '../styles/gros.css';
 import React, { useState } from 'react';
@@ -10,11 +12,31 @@ function SignupPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [registrationMessage, setRegistrationMessage] = useState(null); // Nouvel état
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
-    // Logique pour gérer la soumission du formulaire
-    // Vous pouvez ajouter vos appels API ou mises à jour d'état ici
+
+    const data = {
+      email,
+      password,
+      confirmPassword,
+      username
+    }
+
+    try {
+      const response = await axios.post(`${apiEndpoint}/users`, data);
+      console.log('Registration successful', response.data);
+      setRegistrationMessage('Registration successful');
+      setUsername('');
+      setEmail('');
+      setPassword('');
+      setConfirmPassword('');
+    } catch (error) {
+      console.error('Registration failed', error);
+      setRegistrationMessage('Registration failed');
+    }
+
   };
 
   const styleObjet = {
@@ -37,7 +59,10 @@ function SignupPage() {
                       <div className="row">
                         <div className="col-md-6 mb-3">
                           <InputGroup className="mb-3">
-                            <FormControl type="text" placeholder="Username" value={username} onChange={(e) => setUsername(e.target.value)} required />
+                            <FormControl type="text" 
+                            placeholder="Username" 
+                            value={username} 
+                            onChange={(e) => setUsername(e.target.value)} required />
                           </InputGroup>
                         </div>
                         <div className="col-md-6 mb-3">
@@ -59,7 +84,14 @@ function SignupPage() {
                         </div>
                       </div>
                       <div className="text-center">
-                        <Button type="submit" id="submitSignUp" className="btn bg-gradient-primary w-50 mt-4 mb-0"> Sign Up </Button>
+                        <Button type="submit" id="submitSignUp" className="btn bg-gradient-primary w-50 mt-4 mb-0">
+                          Sign Up
+                        </Button>
+                        {registrationMessage && (
+                          <p className={registrationMessage.includes('successful') ? 'text-success' : 'text-danger'}>
+                            {registrationMessage}
+                          </p>
+                        )}
                       </div>
                     </form>
                   </Card.Body>
@@ -71,7 +103,7 @@ function SignupPage() {
                   </Card.Footer>
                 </Card>
               </div>
-              
+
               <div className="col-md-6">
                 <div className="oblique position-absolute top-0 h-100 d-md-block d-none me-n8">
                   <div className="oblique-image position-absolute fixed-top ms-auto h-100 z-index-0 ms-n6">
@@ -97,5 +129,5 @@ function SignupPage() {
     </div>
   );
 }
-
 export default SignupPage;
+
