@@ -2,17 +2,38 @@ import React, { useState } from 'react';
 import '../styles/soft.css';
 import '../styles/profil.css';
 import '../styles/gros.css';
-import { Link } from 'react-router-dom';
+import { Link, } from 'react-router-dom';
 import { Card, Button, InputGroup, FormControl } from 'react-bootstrap';
-
+import axios from 'axios';
+import { apiEndpoint } from '../ApiConfig';
 export default function SigninPage() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleFormSubmit = (event) => {
+
+  const handleFormSubmit = async (event) => {
     event.preventDefault();
-    // Ajoutez la logique pour gérer la soumission du formulaire de connexion
-    // Par exemple, vous pouvez appeler une API pour vérifier les informations d'identification
+    const data = {
+      email,
+      username,
+      confirmPassword
+    }
+
+    try {
+      console.log('ettooooo', data);
+      const response = await axios.post(`${apiEndpoint}/users`, data);
+      console.log("okkk", response.data);
+      if (response.data.success) {
+        setIsAuthenticated(true);
+      } else {
+        setError(response.data.error);
+      }
+    } catch (error) {
+      console.error('Login failed', error);
+    }
   };
 
   const styleObjet = {
@@ -22,6 +43,9 @@ export default function SigninPage() {
   return (
     <div style={styleObjet}>
       <div className="main-content mt-0">
+      {isAuthenticated ? (
+        <p>Welcome, you are logged in!</p>
+      ) : (
         <div>
           <div className="page-header min-vh-100">
             <div className="container">
@@ -37,22 +61,33 @@ export default function SigninPage() {
                         <label>Email</label>
                         <InputGroup className="mb-3">
                           <FormControl
-                            type="email"
+                            
                             placeholder="Email"
-                            name="email"
+                          
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
                           />
                         </InputGroup>
-                        <label>Password</label>
+                        <label>Username</label>
                         <InputGroup className="mb-3">
                           <FormControl
-                            type="password"
+                            
+                            placeholder="Username"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                          />
+                        </InputGroup>
+
+                        <label>Confirm Password</label>
+                        <InputGroup className="mb-3">
+                          <FormControl
+                           
                             placeholder="Password"
-                            name="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
+                            type ="password"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
                             required
                           />
                         </InputGroup>
@@ -60,6 +95,10 @@ export default function SigninPage() {
                         <div className="text-center">
                           <Button type="submit" className="btn bg-gradient-primary w-50 mt-4 mb-0"> Login </Button>
                         </div>
+                        {error && <p className="text-danger mt-2">{error}</p>}
+                        {error === 'password_no_match' && <p className="text-danger mt-2">Password is incorrect</p>}
+                        {error === 'email_no_match' && <p className="text-danger mt-2">Email is incorrect</p>}
+                        {error === 'password_and_email_no_match' && <p className="text-danger mt-2">Both email and password are incorrect</p>}
                       </form>
                     </Card.Body>
                     <Card.Footer className="text-center pt-0 px-lg-2 px-1">
@@ -93,6 +132,7 @@ export default function SigninPage() {
             </div>
           </div>
         </div>
+      )}
       </div>
     </div>
   );
