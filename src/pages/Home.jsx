@@ -1,24 +1,67 @@
 import '../styles/profil.css';
 import '../styles/gros.css';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Button, Collapse, InputGroup, FormControl } from 'react-bootstrap';
-import { FaThumbsUp, FaComment } from 'react-icons/fa';
+import { FaThumbsUp, FaThumbsDown, FaComment } from 'react-icons/fa';
+import axios from 'axios';
+import { apiEndpoint } from '../ApiConfig';
 
-function ArticleCard({ title, content, imgSrc }) {
+function ArticleCard({ title, content, imgSrc, userId }) {
     const [likes, setLikes] = useState(0);
-    const [comments, setComments] = useState([]); // État pour les commentaires
+    const [likeStatus, setLikeStatus] = useState(null);
+    const [comments, setComments] = useState([]);
+    const [reactionType, setReactionType] = useState(null);
 
-    const handleLikeClick = () => {
-        setLikes(likes + 1);
+    const handleLikeClick = async () => {
+        if (reactionType === 'LIKE') {
+            setLikes(likes - 1);
+            setLikeStatus(null);
+            setReactionType(null);
+        } else {
+            setLikes(likes + 1);
+            setLikeStatus('LIKE');
+            setReactionType('LIKE');
+        }
+        await saveReactionToServer(reactionType);
     };
+
+    const handleDislikeClick = async () => {
+        if (reactionType === 'DISLIKE') {
+            setLikeStatus(null);
+            setReactionType(null);
+        } else {
+            setLikeStatus('DISLIKE');
+            setReactionType('DISLIKE'); // Ajout de cette ligne
+        }
+        await saveReactionToServer(reactionType); // Utilisez `reactionType` ici
+    };
+
 
     const handleCommentSubmit = () => {
         const commentInput = document.getElementById(`commentInput${title}`);
         if (commentInput.value.trim() !== '') {
-            setComments([...comments, commentInput.value.trim()]); // Ajouter le commentaire
-            commentInput.value = ''; // Réinitialiser l'input
+            setComments([...comments, commentInput.value.trim()]);
+            commentInput.value = '';
         }
     };
+
+    const saveReactionToServer = async (type) => {
+        if (type) {
+
+            console.log("le type est kkk", type);
+            try {
+                const response = await axios.delete(`${apiEndpoint}/posts/:pid/reactions`, {
+                    type: type,
+                    userId: userId,
+                });
+            console.log('oook', response);
+                console.log('Réaction enregistrée avec succès', response.data);
+            } catch (error) {
+                console.error('Erreur lors de l\'enregistrement de la réaction', error);
+            }
+        }
+    };
+
 
     return (
         <Card className="mb-4">
@@ -28,9 +71,32 @@ function ArticleCard({ title, content, imgSrc }) {
                 <div className="col-md-4 mb-4">
                     <img src={imgSrc} alt="Photo" className="img-fluid" />
                 </div>
+
                 <Button variant="outline-primary" id={`like${title}`} onClick={handleLikeClick}>
-                    <FaThumbsUp /> J'aime {likes}
+                    {likeStatus === 'LIKE' ? (
+                        <span>
+                            <FaThumbsUp fill="blue" /> J'aime {likes}
+                        </span>
+                    ) : (
+                        <span>
+                            <FaThumbsUp /> J'aime {likes}
+                        </span>
+                    )}
                 </Button>
+
+                <Button variant="outline-danger" id={`dislike${title}`} onClick={handleDislikeClick}>
+                    {likeStatus === 'DISLIKE' ? (
+                        <span>
+                            <FaThumbsDown fill="red" /> Je n'aime pas {likes}
+                        </span>
+                    ) : (
+                        <span>
+                            <FaThumbsDown /> Je n'aime pas {likes}
+                        </span>
+                    )}
+                </Button>
+
+
                 <Button variant="outline-secondary" data-bs-toggle="collapse" data-bs-target={`#commentCollapse${title}`}>
                     <FaComment /> Commenter
                 </Button>
@@ -59,21 +125,47 @@ function ArticleCard({ title, content, imgSrc }) {
 
 
 
-
 export default function HomePage() {
-    const articles = [
-        {
-            title: 'Article 1',
-            content: 'Contenu de l\'article 1.',
-            imgSrc: './img/team-1.jpg',
-        },
-        {
-            title: 'Article 2',
-            content: 'Contenu de l\'article 2.',
-            imgSrc: './img/team-2.jpg',
-        },
-        // Ajoutez d'autres articles ici si nécessaire
-    ];
+    const [user, setUser] = useState(null);
+    const [users, setUsers] = useState([]);
+    const [articles, setArticles] = useState([]);
+
+    useEffect(() => {
+        // Récupérer les informations de l'utilisateur depuis l'API
+        const fetchUser = async () => {
+            try {
+                const response = await axios.get(`${apiEndpoint}/users`); // Remplacez par l'URL appropriée
+                setUser(response.data);
+                console.log('heyyy', response.data);
+            } catch (error) {
+                console.error('Erreur lors de la récupération des informations de l\'utilisateur', error);
+            }
+        };
+
+        // Récupérer la liste des articles depuis l'API
+        const fetchArticles = async () => {
+            try {
+                const response = await axios.get(`${apiEndpoint}/posts`); // Remplacez par l'URL appropriée
+                setArticles(response.data);
+            } catch (error) {
+                console.error('Erreur lors de la récupération des articles', error);
+            }
+        };
+
+        // Appeler les fonctions de récupération des données
+        fetchUser();
+        fetchArticles();
+    }, []);
+
+    if (!users || !user || articles.length === 0) {
+        return <div>Chargement...</div>;
+    }
+
+    let selectedUser = null; // Définissez selectedUser à l'extérieur de la condition
+
+    if (users.length > 0 && user) {
+        selectedUser = users[0]; // Assurez-vous de définir selectedUser à l'intérieur de cette condition
+    }
 
     return (
         <div className="descend2">
@@ -87,6 +179,7 @@ export default function HomePage() {
                                     title={article.title}
                                     content={article.content}
                                     imgSrc={article.imgSrc}
+                                    userId={selectedUser ? selectedUser.id : null}
                                 />
                             ))}
                         </div>
