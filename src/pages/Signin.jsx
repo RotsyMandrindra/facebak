@@ -6,10 +6,11 @@ import { Link, } from 'react-router-dom';
 import { Card, Button, InputGroup, FormControl } from 'react-bootstrap';
 import axios from 'axios';
 import { apiEndpoint } from '../ApiConfig';
+
 export default function SigninPage() {
   const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [username, setUsername] = useState('');
-  const [confirmPassword, setConfirmPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState('');
 
@@ -18,22 +19,26 @@ export default function SigninPage() {
     event.preventDefault();
     const data = {
       email,
-      username,
-      confirmPassword
+      password,
+     
     }
 
     try {
       console.log('ettooooo', data);
-      const response = await axios.post(`${apiEndpoint}/users`, data);
-      console.log("okkk", response.data);
+      const response = await axios.put(`${apiEndpoint}/users`, data);
+      console.log("okkk", response);
+
       if (response.data.success) {
         setIsAuthenticated(true);
+        setError('');
       } else {
         setError(response.data.error);
+        setIsAuthenticated(false);
       }
     } catch (error) {
       console.error('Login failed', error);
     }
+    
   };
 
   const styleObjet = {
@@ -58,42 +63,45 @@ export default function SigninPage() {
                     </Card.Header>
                     <Card.Body>
                       <form role="form" id="loginForm" onSubmit={handleFormSubmit}>
-                        <label>Email</label>
+
+                      <label>Email</label>
                         <InputGroup className="mb-3">
                           <FormControl
-                            
+                            type="email"
                             placeholder="Email"
-                          
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             required
                           />
                         </InputGroup>
-                        <label>Username</label>
-                        <InputGroup className="mb-3">
-                          <FormControl
-                            
-                            placeholder="Username"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            required
-                          />
-                        </InputGroup>
 
-                        <label>Confirm Password</label>
+                        <label>Password</label>
                         <InputGroup className="mb-3">
                           <FormControl
                            
                             placeholder="Password"
                             type ="password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                             required
                           />
                         </InputGroup>
 
+                        <label>Username</label>
+                        <InputGroup className="mb-3">
+                          <FormControl
+                            placeholder="Username"
+                            type ="text"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                            required
+                          />
+                        </InputGroup>
+                        
+
+
                         <div className="text-center">
-                          <Button type="submit" className="btn bg-gradient-primary w-50 mt-4 mb-0"> Login </Button>
+                          <Button type="submit" id="submitSignin" className="btn bg-gradient-primary w-50 mt-4 mb-0"> Login </Button>
                         </div>
                         {error && <p className="text-danger mt-2">{error}</p>}
                         {error === 'password_no_match' && <p className="text-danger mt-2">Password is incorrect</p>}
