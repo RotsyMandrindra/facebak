@@ -54,7 +54,7 @@ export default function Navbar() {
                                 <ul className="navbar-nav d-lg-block d-none">
                                     <li className="nav-item">
                                         <Link to="/profil" className="mb-0 me-1">
-                                            <img src="./img/team-1.jpg" alt="Profile Avatar" className="profile-avatar2" />
+                                            <img src="./img/team-1.jpg" alt="" className="profile-avatar2" />
                                         </Link>
                                     </li>
                                 </ul>

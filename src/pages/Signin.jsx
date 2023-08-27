@@ -1,19 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/soft.css';
 import '../styles/profil.css';
 import '../styles/gros.css';
-import { Link, } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Card, Button, InputGroup, FormControl } from 'react-bootstrap';
 import axios from 'axios';
 import { apiEndpoint } from '../ApiConfig';
+import Cookies from 'js-cookie';
 
 export default function SigninPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [username, setUsername] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [error, setError] = useState('');
+  const [userId, setUserId] = useState('');
 
+
+  const navigate = useNavigate();
 
   const handleFormSubmit = async (event) => {
     event.preventDefault();
@@ -28,18 +31,36 @@ export default function SigninPage() {
       const response = await axios.put(`${apiEndpoint}/users`, data);
       console.log("okkk", response);
 
-      if (response.data.success) {
+      if (response.status === 200 ) {
+        const authToken = response.data.token;
+        Cookies.set('token', authToken, { expires: 7 });
         setIsAuthenticated(true);
         setError('');
+        navigate('/home');
       } else {
         setError(response.data.error);
         setIsAuthenticated(false);
       }
+      
     } catch (error) {
       console.error('Login failed', error);
     }
     
   };
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      // Récupérez l'ID d'utilisateur depuis l'API ici
+      axios.get(`${apiEndpoint}/users${userId}`, data) // Remplacez par le bon endpoint
+        .then(response => {
+          console.log("isAuthenticated", response);
+          setUserId(response.data.userId);
+        })
+        .catch(error => {
+          console.error('Error fetching user ID:', error);
+        });
+    }
+  }, [isAuthenticated]);
 
   const styleObjet = {
     marginRight: '50px',
@@ -87,19 +108,7 @@ export default function SigninPage() {
                           />
                         </InputGroup>
 
-                        <label>Username</label>
-                        <InputGroup className="mb-3">
-                          <FormControl
-                            placeholder="Username"
-                            type ="text"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                            required
-                          />
-                        </InputGroup>
-                        
-
-
+                
                         <div className="text-center">
                           <Button type="submit" id="submitSignin" className="btn bg-gradient-primary w-50 mt-4 mb-0"> Login </Button>
                         </div>

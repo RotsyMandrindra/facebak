@@ -14,10 +14,7 @@ function App() {
     <BrowserRouter>
       <Navbar />
       <Routes>
-      <Route
-          path='/'
-          element={<SignupPage apiEndpoint={apiEndpoint} />}
-        />
+      <Route path='/'element={<SignupPage apiEndpoint={apiEndpoint} />}/>
         <Route path='/profil' element={<Profilpage />} />
         <Route path='/home' element={<HomePage />} />
         <Route path='/signin' element={<SigninPage />} />

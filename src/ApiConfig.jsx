@@ -1,3 +1,3 @@
 
-export const apiEndpoint = 'http://[::1]:8080';
+export const apiEndpoint = 'http://localhost:8080';
 

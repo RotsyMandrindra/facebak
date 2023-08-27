@@ -7,8 +7,8 @@ import { apiEndpoint } from '../ApiConfig';
 
 
 export default function ProfilPage() {
-  const [username, setUsername] = useState(' You Name ');
-  const [bio, setBio] = useState(' Your bio ');
+  const [username, setUsername] = useState('');
+  const [bio, setBio] = useState('');
   const [photos, setPhotos] = useState([
     './img/team-1.jpg',
     './img/team-2.jpg',
@@ -23,11 +23,63 @@ export default function ProfilPage() {
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [updateFailed, setUpdateFailed] = useState(false);
   const [formReset, setFormReset] = useState(false);
-  
+  const [userId, setUserId] = useState('');
+  const [user, setUser] = useState(null);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  useEffect(() => {
+    if (userId) {
+      axios.get(`/users/${userId}`)
+        .then(response => {
+
+          console.log("userID", response);
+          setUsername(response.data.username);
+          setBio(response.data.bio);
+
+        })
+        .catch(error => {
+          console.error('Error fetching user by ID:', error);
+        });
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const response = await axios.get(`${apiEndpoint}/users`);
+
+        console.log("fetchUser", response);
+        setUser(response.data);
+        setSelectedUser(response.data[0]);
+      } catch (error) {
+        console.error('Erreur lors de la récupération des informations de l\'utilisateur', error);
+      }
+    };
+
+
+    fetchUser();
+
+
+    // Récupérer les informations de l'utilisateur par son ID
+    if (selectedUser) {
+      const fetchUserById = async (userId) => {
+        try {
+          const userByIdResponse = await axios.get(`${apiEndpoint}/users/${userId}`);
+
+          console.log("fetchUserById voila", userByIdResponse);
+        } catch (error) {
+          console.error('Erreur lors de la récupération des informations de l\'utilisateur par ID', error);
+        }
+      };
+
+      fetchUserById(selectedUser.id);
+    }
+  }, []);
+
 
   useEffect(() => {
     let timer;
-    
+
     if (updateSuccess || updateFailed) {
       timer = setTimeout(() => {
         setUpdateSuccess(false);
@@ -92,18 +144,20 @@ export default function ProfilPage() {
                   <div className="row">
                     <div className="col-md-4">
                       <div className="profile-header">
-                        <img src="./img/team-4.jpg" alt="Profile Avatar" className="profile-avatar" />
+                        <img src="./img/team-4.jpg" alt="" className="profile-avatar" />
                         <div className="profile-name">
                           {username}
                         </div>
                         <div className="profile-bio">
                           {bio}
                         </div>
+
                       </div>
                       <div className="profile-stats">
                         <div className="profile-stat">Followers: 10K</div>
                         <div className="profile-stat">Following: 200</div>
                       </div>
+                      
                     </div>
                     <div className="col-md-8">
                       <div className="profile-content">
@@ -189,7 +243,7 @@ export default function ProfilPage() {
                         <div className="row">
                           {photos.map((photo, index) => (
                             <div className="col-md-4 mb-4" key={index}>
-                              <img src={photo} alt={`Photo ${index + 1}`} className="img-fluid" />
+                              <img src={photo} alt={`${index + 1}`} className="img-fluid" />
                             </div>
                           ))}
                         </div>
