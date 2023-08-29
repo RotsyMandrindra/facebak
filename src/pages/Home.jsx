@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { apiEndpoint } from '../ApiConfig';
+import { Put, Get, Post } from '../ApiConfig';
+
 import ArticleCard from './ArticleCard';
 import { Form, Button } from 'react-bootstrap';
 
 function HomePage() {
     const [user, setUser] = useState(null);
-    
+
     const [articles, setArticles] = useState([]);
     const [articleReactions, setArticleReactions] = useState({});
     const [selectedUser, setSelectedUser] = useState(null);
@@ -15,36 +17,29 @@ function HomePage() {
     const [newPostImage, setNewPostImage] = useState('');
 
     useEffect(() => {
-        const fetchUser = async () => {
+        const fetchData = async () => {
             try {
-                const response = await axios.get(`${apiEndpoint}/users`);
-                setUser(response.data);
-                setSelectedUser(response.data[0]);
+                const userResponse = await Get('/users');
+                const articleResponse = await Get('/posts');
+
+                // console.log("Userrsponse", userResponse);
+
+                setUser(userResponse); // Utilisez userResponse.data pour accéder aux données des utilisateurs
+                setArticles(articleResponse); // Utilisez articleResponse.data pour accéder aux données des articles
+
+                setSelectedUser(userResponse[0]);
             } catch (error) {
-                console.error('Erreur lors de la récupération des informations de l\'utilisateur', error);
+                console.error('Erreur lors de la récupération des informations', error);
             }
         };
 
+        fetchData();
 
-        const fetchArticles = async () => {
-            try {
-                const response = await axios.get(`${apiEndpoint}/posts`);
-                setArticles(response.data);
-                console.log("setArticle", response.data);
-
-            } catch (error) {
-                console.error('Erreur lors de la récupération des articles', error);
-            }
-        };
-
-        fetchUser();
-        fetchArticles();
-
-        // Récupérer les informations de l'utilisateur par son ID
         if (selectedUser) {
             const fetchUserById = async (userId) => {
                 try {
-                    const userByIdResponse = await axios.get(`${apiEndpoint}/users/${userId}`);
+                    console.log("fetchUserById voila", userByIdResponse);
+                    const userByIdResponse = Get(`/users/${userId}`);
 
                     console.log("fetchUserById voila", userByIdResponse);
                 } catch (error) {
@@ -56,6 +51,7 @@ function HomePage() {
         }
     }, []);
 
+
     const updateArticleReactions = (title, reactionType) => {
         const updatedReactions = { ...articleReactions };
         if (!updatedReactions[title]) {
@@ -66,33 +62,42 @@ function HomePage() {
     };
 
 
+ 
+
     const handleNewPostSubmit = async (event) => {
         event.preventDefault();
-
+    
+        const data = {
+            title: newPostTitle,
+            content: newPostContent,
+            userId: selectedUser ? selectedUser.id : null,
+        };
+    
         try {
-            const response = await axios.put(`${apiEndpoint}/posts`, {
-                title: newPostTitle,
-                content: newPostContent,
-                imgSrc: newPostImage,
-                userId: selectedUser ? selectedUser.id : null,
-                // userId: selectedUser.id, // Assurez-vous de gérer l'ID de l'utilisateur
-            });
-
-            // Mettre à jour la liste des articles avec le nouveau post
-            setArticles([...articles, response.data]);
-
-            // Réinitialiser les champs du formulaire
-            setNewPostTitle('');
-            setNewPostContent('');
-            setNewPostImage('');
+            console.log('Données du nouveau post', data);
+            const response = await Put('/posts', data);  // Utilisation d'async/await
+    
+            console.log('Réponse du serveur', response);
+    
+            if (response && response.title && response.content) {
+                setArticles([...articles, response]);  // Utilisation de response directement
+                setNewPostTitle('');
+                setNewPostContent('');
+            } else {
+                console.error('La réponse ne contient pas la structure attendue.');
+            }
         } catch (error) {
             console.error('Erreur lors de la création du nouveau post', error);
         }
     };
+    
 
 
 
-    if ( !user || articles.length === 0) {
+
+
+
+    if (!user || articles === 0) {
         return <div>Chargement...</div>;
     }
 
@@ -103,7 +108,7 @@ function HomePage() {
                 <div className="container">
                     <div className="row">
                         <div className="col-md-8 mx-auto">
-                        <img src="./img/team-1.jpg" alt="" className="profile-avatar2" />
+                            <img src="./img/team-1.jpg" alt="" className="profile-avatar2" />
                             <h2>
                                 Quoi de neuf ?
                             </h2>
@@ -126,7 +131,7 @@ function HomePage() {
                                         onChange={(e) => setNewPostContent(e.target.value)}
                                     />
                                 </Form.Group>
-                               
+
                                 <Button variant="primary" type="submit">
                                     Créer post
                                 </Button>
@@ -136,7 +141,6 @@ function HomePage() {
                                     key={article.title}
                                     title={article.title}
                                     content={article.content}
-                                    imgSrc={article.imgSrc}
                                     userId={selectedUser ? selectedUser.id : null}
                                     article={article}
                                     articleReactions={articleReactions}

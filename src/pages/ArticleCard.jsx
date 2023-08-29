@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Card, Button, Collapse, InputGroup, FormControl } from 'react-bootstrap';
 import { FaThumbsUp, FaThumbsDown, FaComment } from 'react-icons/fa';
-import axios from 'axios';
-import { apiEndpoint } from '../ApiConfig';
+
+import { Post, Get, Put, Delete } from '../ApiConfig';
 
 function ArticleCard({ title, content, imgSrc, userId, article, articleReactions, 
     updateArticleReactions, 
@@ -22,9 +22,8 @@ function ArticleCard({ title, content, imgSrc, userId, article, articleReactions
 
     const fetchComments = async (postId) => {
         try {
-            const response = await axios.get(`${apiEndpoint}/posts/${postId}/comments`);
-
-            const fetchedComments = response.data;
+            const response = await Get(`/posts/${postId}/comments`);
+            const fetchedComments = response;
             setComments(fetchedComments);
             setLoadingComments(false); // Mettre à jour l'état pour indiquer que les commentaires ont été chargés
         } catch (error) {
@@ -41,9 +40,10 @@ function ArticleCard({ title, content, imgSrc, userId, article, articleReactions
 
     const fetchReactions = async (postId) => {
         try {
-            const response = await axios.get(`${apiEndpoint}/posts/${postId}/reactions`);
+            const response = Get(`/posts/${postId}/reactions`);
+           // console.log('fetchReactions', response);
 
-            const reactions = response.data;
+            const reactions = response;
             setArticleReactions((prevReactions) => ({
                 ...prevReactions,
                 [postId]: reactions,
@@ -78,33 +78,17 @@ function ArticleCard({ title, content, imgSrc, userId, article, articleReactions
     };
 
 
-    const handleDislikeClick = async () => {
-        if (likeStatus === 'DISLIKE') {
-            setLikes(likes + 1);
-            setLikeStatus(null);
-            setReactionType(null);
-            await deleteReactionFromServer('DISLIKE', article.id);
-        } else {
-            setLikes(likes - 1);
-            setLikeStatus('DISLIKE');
-            setReactionType('DISLIKE');
-            await saveReactionToServer('DISLIKE', article.id);
-
-            // Remove like status if present
-            if (likeStatus === 'LIKE') {
-                await deleteReactionFromServer('LIKE', article.id);
-            }
-        }
-        updateArticleReactions('DISLIKE');
-    };
+ 
 
     const saveCommentToServer = async (comment) => {
         try {
-            const response = await axios.put(`${apiEndpoint}/posts/${comment.postId}/comments`, {
+            const response = await Put(`/posts/${comment.postId}/comments`, {
                 content: comment.text,  // Inclure la propriété "content"
                 userId: comment.userId, // Utiliser "comment.userId" au lieu de "userId"
+                
             });
-
+            
+            console.log("savement", response);
             console.log('Commentaire enregistré avec succès', response.data);
         } catch (error) {
             console.error('Erreur lors de l\'enregistrement du commentaire', error);
@@ -135,7 +119,7 @@ function ArticleCard({ title, content, imgSrc, userId, article, articleReactions
 
     const saveReactionToServer = async (reactionType, postId) => {
         try {
-            await axios.post(`${apiEndpoint}/posts/${postId}/reactions`, {
+            Post(`/posts/${postId}/reactions`, {
                 type: reactionType,
                 userId: userId,
             });
@@ -148,7 +132,7 @@ function ArticleCard({ title, content, imgSrc, userId, article, articleReactions
 
     const deleteReactionFromServer = async (reactionType, postId) => {
         try {
-            await axios.delete(`${apiEndpoint}/posts/${postId}/reactions`, {
+            Delete(`/posts/${postId}/reactions`, {
                 data: {
                     userId: userId,
                     type: reactionType,

@@ -1,25 +1,26 @@
 import './App.css';
-import Profilpage from './pages/Profil';
+import ProfilPage from './pages/Profil';
 import HomePage from './pages/Home';
 import Navbar from './components/Navbar';
-import SignupPage  from './pages/Signup';
+import SignupPage from './pages/Signup';
 import SigninPage from './pages/Signin';
-import { BrowserRouter } from 'react-router-dom';
-import { Routes } from 'react-router-dom';
-import { Route } from 'react-router-dom';
-import { apiEndpoint } from './ApiConfig';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { AuthProvider } from './pages/AuthContext';
 
 function App() {
   return (
     <BrowserRouter>
-      <Navbar />
-      <Routes>
-      <Route path='/'element={<SignupPage apiEndpoint={apiEndpoint} />}/>
-        <Route path='/profil' element={<Profilpage />} />
-        <Route path='/home' element={<HomePage />} />
-        <Route path='/signin' element={<SigninPage />} />
-      </Routes>
+      <AuthProvider>
+        <Navbar />
+        <Routes>
+          <Route path="/" element={<SignupPage />} />
+          <Route path="/profil" element={<ProfilPage />} />
+          <Route path="/home" element={<HomePage />} />
+          <Route path="/signin" element={<SigninPage />} />
+        </Routes>
+      </AuthProvider>
     </BrowserRouter>
   );
 }
+
 export default App;

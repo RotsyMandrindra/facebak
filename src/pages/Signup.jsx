@@ -4,7 +4,7 @@ import { Card } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import SignupForm from './SignupForm';
 import axios from 'axios';
-import { apiEndpoint } from '../ApiConfig';
+import { Post } from '../ApiConfig';
 import '../styles/profil.css';
 import '../styles/gros.css';
 
@@ -26,8 +26,8 @@ function SignupPage() {
     }
 
     try {
-      const response = await axios.post(`${apiEndpoint}/users`, data);
-      console.log('Registration successful', response.data);
+      const response = Post('/users', data);
+      console.log('Registration successful');
       setRegistrationMessage('Registration successful');
       setUsername('');
       setEmail('');

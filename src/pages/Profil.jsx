@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react';
 import '../styles/soft.css';
 import '../styles/profil.css';
 import '../styles/gros.css';
-import axios from 'axios';
-import { apiEndpoint } from '../ApiConfig';
+import { Put, Get } from '../ApiConfig';
+
 
 
 export default function ProfilPage() {
@@ -26,10 +26,10 @@ export default function ProfilPage() {
   const [userId, setUserId] = useState('');
   const [user, setUser] = useState(null);
   const [selectedUser, setSelectedUser] = useState(null);
+  
 
   useEffect(() => {
-    if (userId) {
-      axios.get(`/users/${userId}`)
+    if (userId) { Get(`/users/${userId}`)
         .then(response => {
 
           console.log("userID", response);
@@ -44,27 +44,12 @@ export default function ProfilPage() {
   }, [userId]);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get(`${apiEndpoint}/users`);
-
-        console.log("fetchUser", response);
-        setUser(response.data);
-        setSelectedUser(response.data[0]);
-      } catch (error) {
-        console.error('Erreur lors de la récupération des informations de l\'utilisateur', error);
-      }
-    };
-
-
-    fetchUser();
-
 
     // Récupérer les informations de l'utilisateur par son ID
     if (selectedUser) {
       const fetchUserById = async (userId) => {
         try {
-          const userByIdResponse = await axios.get(`${apiEndpoint}/users/${userId}`);
+          const userByIdResponse = Get(`/users/${userId}`);
 
           console.log("fetchUserById voila", userByIdResponse);
         } catch (error) {
@@ -105,11 +90,9 @@ export default function ProfilPage() {
 
     try {
       console.log('eeehh', updatedProfileData)
-      const response = await axios.put(`${apiEndpoint}/users`, updatedProfileData);
+      const response = await Put('/users', updatedProfileData);
       console.log('notre réponse', response);
-      console.log('data success', response.data.success);
-
-      if (response.status === 200) {
+    
         console.log('Profile updated successfully');
         setUpdateSuccess(true);
         setUpdateFailed(false);
@@ -121,11 +104,6 @@ export default function ProfilPage() {
         setConfirmNewPassword('');
         setFormReset(true);
 
-      } else {
-        console.error('Profile update failed');
-        setUpdateSuccess(false);
-        setUpdateFailed(true);
-      }
     } catch (error) {
       console.error('Profile update error:', error);
       setUpdateSuccess(false);

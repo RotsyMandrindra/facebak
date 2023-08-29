@@ -1,57 +1,51 @@
-import React, { useState, useEffect } from 'react';
 import '../styles/soft.css';
 import '../styles/profil.css';
 import '../styles/gros.css';
+
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Card, Button, InputGroup, FormControl } from 'react-bootstrap';
-import axios from 'axios';
-import { apiEndpoint } from '../ApiConfig';
-import Cookies from 'js-cookie';
+import { Login } from '../ApiConfig';
+import { useAuth } from './AuthContext';
+
 
 export default function SigninPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [error, setError] = useState('');
-  const [userId, setUserId] = useState('');
-
-
+  const { setUserId } = useAuth(); 
   const navigate = useNavigate();
 
-  const handleFormSubmit = async (event) => {
+  const handleFormSubmit = (event) => {
     event.preventDefault();
     const data = {
       email,
       password,
-     
-    }
-
+    };
+  
     try {
       console.log('ettooooo', data);
-      const response = await axios.put(`${apiEndpoint}/users`, data);
-      console.log("okkk", response);
-
-      if (response.status === 200 ) {
-        const authToken = response.data.token;
-        Cookies.set('token', authToken, { expires: 7 });
-        setIsAuthenticated(true);
-        setError('');
-        navigate('/home');
-      } else {
-        setError(response.data.error);
-        setIsAuthenticated(false);
-      }
-      
+      Login('/users', data)
+        .then(response => {
+          console.log("katsaka" , response.data)
+          setUserId(response.data)
+          console.log("iciii", response);
+            navigate('/profil');
+    
+        })
+        .catch(error => {
+          console.error('Login failed', error);
+        });
     } catch (error) {
       console.error('Login failed', error);
     }
-    
   };
+  
 
   useEffect(() => {
     if (isAuthenticated) {
       // Récupérez l'ID d'utilisateur depuis l'API ici
-      axios.get(`${apiEndpoint}/users${userId}`, data) // Remplacez par le bon endpoint
+      Get(`/users/${userId}`)
         .then(response => {
           console.log("isAuthenticated", response);
           setUserId(response.data.userId);
@@ -112,10 +106,6 @@ export default function SigninPage() {
                         <div className="text-center">
                           <Button type="submit" id="submitSignin" className="btn bg-gradient-primary w-50 mt-4 mb-0"> Login </Button>
                         </div>
-                        {error && <p className="text-danger mt-2">{error}</p>}
-                        {error === 'password_no_match' && <p className="text-danger mt-2">Password is incorrect</p>}
-                        {error === 'email_no_match' && <p className="text-danger mt-2">Email is incorrect</p>}
-                        {error === 'password_and_email_no_match' && <p className="text-danger mt-2">Both email and password are incorrect</p>}
                       </form>
                     </Card.Body>
                     <Card.Footer className="text-center pt-0 px-lg-2 px-1">
